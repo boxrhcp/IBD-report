@@ -1,4 +1,4 @@
-\documentclass[11pt, letterpaper]{report}
+\documentclass[11pt, titlepage]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage{titlesec}
@@ -7,14 +7,35 @@
 {\normalfont\huge\bfseries}{\thechapter}{20pt}{}
 \titlespacing*{\chapter}
 {0pt}{20pt}{20pt}
-\title{Paper Report "MacroBase: Prioritizing Attention in Fast Data"}
+\title{Paper Report "MacroBase: Prioritizing Attention in Fast Data" \\ Big Data Storage and Processing Infrastructures}
 \author{Fayán Leonardo Pardo Ladino}
 \date{March 2019}
 \begin{document}
 	\maketitle
-	\chapter{Introduction}
+	\section{Introduction}
 	\begin{flushleft}
-		In this report i am going to summarize and explain the paper "MacroBase: Prioritizing Attention in Fast Data". I am going to sum up main concept and description of MacroBase, the design behind it, the tests and results the researchers did on the solution, sum up their conclusions and finally I will relate it with the IBD course and expose my conclusions gathered after reading the paper.
+		In this report I am going to summarize and explain the paper "\textit{MacroBase}: Prioritizing Attention in Fast Data". I am going to explain the main concept and description of \textit{MacroBase}, the design behind it, the tests the researchers did on the solution, their conclusions and finally I will link it with the IBD course and expose my conclusions gathered after reading the paper.
 	\end{flushleft}
+	\section{Paper Introduction}
+	\begin{flushleft}
+		As stated in the paper we are nowadays gathering and dealing with huge amounts of data, companies like \textit{Twitter} gather more than 12M events per second. These numbers have been increasing since then (2017) and it is still not going to stop increasing. This has made difficult to process data with human abilities, not only because of the amount of data, but also because in most of the cases this information must be analysed fast. Although there are industrial existing solutions to deal with these problems, such as \textit{Apache Flink} which enables stream processing, these still leave to the application developer the implementation of scalable analysis that prioritize attention. This development should take into account that fast data analysis should determine few results to send them to end users, execute quickly to keep up with huge data volumes and adapt changes within the data stream itself. The paper also states that the high-ends industrial deployments rely a lot on static rules and thresholds which are computationally efficient but fragile and error-prone.
+		\\With all these problems in mind, researchers from Stanford University developed \textit{MacroBase}. \textit{MacroBase} is an analytics engine which provides operators to classify and explain fast data volume to users using extensible streaming dataflow pipelines. It permits the users to tune the queries by adding specific feature transformations to their pipelines, providing supervised classification rules to complement or replace unsupervised classifiers and creating custom streaming transformation, classification and explanation operators.
+		\\The paper also states in this section that \textit{MacroBase} has been successful in several analysis implementations, for example, to find unusual and previously unknown behaviours in their products. In order to explain better in the paper how \textit{MacroBase} works, they focused in three industrial use cases they seek to support with this solution: mobile applications, datacenter operation and industrial monitoring.
+	\end{flushleft}
+	\section{MacroBase Architecture}
+	\begin{flushleft}
+		As stated before, \textit{MacroBase} prioritizes attention and to do so it uses two classes of operators: Classification operators, which examine data points and labels them according to user-specified classes, and Explanation operators which will group and aggregate multiple data points. Developing these operators is the core concept behind \textit{MacroBase}, relational analytics have well defined re-usable operators but not for classification and explanation. With this in mind, the paper explained \textit{MicroBase} structure and architecture the following way.
+		\\\textit{MacroBase} runs \textbf{Query Pipelines} of dataflow operators over input data streams. These pipelines follow two principles: First, and as I just mentioned, the operators work over data streams; second, it uses a compiler system to enforce interoperability, making each operator to implement one of several type signatures. By this way the compiler enforces that all pipelines will follow a common structure:
+		\\\textbf{1. Ingestion.} \textit{MacroBase} ingests data streams from external data sources. In the paper they show as example JDBC to read from SQL queries. Following this example, \textit{MacroBase} will create data points for each row ingested and each data point will have a set of \textit{metrics} used for key measurements (e.g. trip time) and \textit{attributes} that correspond to associated metadata (e.g user ID). The metrics will be used to detect unusual events and the attributes to explain behaviours.
+		\\\textbf{2. Feature Transformation.} \textit{MacroBase} executes data transformations over the stream. These transformations can be statistical, datatype specific or time series specific operations. This feature placed at the beginning of the pipeline lets users to prepare or encode their data for the following steps without modifying later stages. Also given that the base type is unchanged in this feature (from data point to data point), it can be chained several times to apply different transformations.
+		\\\textbf{3. Classification.} \textit{MacroBase} labels each point according to its metrics. The training and the evaluating classifiers of the metrics happen in this stage. For this, \textit{MacroBase} supports several models. The paper describes later, for example, a default unsupervised model offered by \textit{MacroBase}  but users can also use their supervised and pre-trained model. This operator will receive a stream of data points (\textit{Point}) and will create a stream of a labelled points (\textit{Label, Point}).
+		\\\textbf{4. Explanation.} Instead of returning the result of labelled points, \textit{MacroBase} will aggregate them and create explanations. By default, \textit{MicroBase} will return explanations in the form of attribute-value combinations common among outlier points and uncommon among inlier points. This operator will receive a stream of labelled points (\textit{Label, Point}) and will generate explanations (\textit{Explanation}). The \textit{Explanation} subclass provide additional information like statistics or representative sequences of points. \textit{MicroBase} will continuously execute explanation operators to summarize the stream, but the emission of explanations will be done by user demand to avoid waste of resources.
+		\\\textbf{5. Presentation.} Given that the number of generated explanations may still be large, \textit{MicroBase} pipelines rank explanations by statistics specific to the explanations and sorts them by their degree of outlier. By default, \textit{MicroBase} will render a report and present it via REST API or GUI.
+		\\\textbf{Operating Modes.} \textit{MacroBase} supports three operating modes: \textit{MacroBase} graphical front-end to allow users to interactively explore their data and configure inputs, metrics and attributes; One-shot queries executions that can be run programmatically over the data; Streaming queries that can be run programmatically over a potentially infinite stream of data, if desired, with triggers to alert customers or users.
+	\end{flushleft}
+	\section{MacroBase Default Pipeline Classification}
+	\begin{flushleft}
+	\end{flushleft}
+
 \end{document}
 
